@@ -8,19 +8,8 @@ import { CategoryService } from './services/category.service';
 import { ProductService } from './services/product.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Category,
-      Product,
-    ])
-  ],
-  controllers: [
-    ProductController,
-    CategoryController,
-  ],
-  providers: [
-    ProductService,
-    CategoryService,
-  ]
+  imports: [TypeOrmModule.forFeature([Category, Product])],
+  controllers: [ProductController, CategoryController],
+  providers: [ProductService, CategoryService],
 })
 export class ProductModule {}
