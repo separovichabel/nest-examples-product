@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateCategoryDto } from '../dto/create-category.dto';
-import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { CreateCategoryDto } from '../dtos/create-category.dto';
+import { UpdateCategoryDto } from '../dtos/update-category.dto';
 import { Category } from '../entities/category.entity';
 
 @Injectable()
@@ -29,7 +29,14 @@ export class CategoryService {
     return this.repository.save(updateCategory);
   }
 
-  remove(id: number) {
-    return this.repository.delete(id);
+  async remove(id: number) {
+    const category = await this.repository.findOne(id)
+
+    if (category) {
+      await this.repository.delete(id);
+      return category
+    }
+
+    return
   }
 }

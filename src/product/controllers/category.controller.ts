@@ -3,13 +3,15 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  UseInterceptors,
+  Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { CreateCategoryDto } from '../dto/create-category.dto';
-import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { CreateCategoryDto } from '../dtos/create-category.dto';
+import { UpdateCategoryDto } from '../dtos/update-category.dto';
+import { NotFoundInterceptor } from '../interceptors/notFound.interceptor';
 import { CategoryService } from '../services/category.service';
 
 @ApiTags('categories')
@@ -28,11 +30,12 @@ export class CategoryController {
   }
 
   @Get(':id')
+  @UseInterceptors(NotFoundInterceptor)
   findOne(@Param('id') id: string) {
     return this.categoryService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
@@ -41,6 +44,7 @@ export class CategoryController {
   }
 
   @Delete(':id')
+  @UseInterceptors(NotFoundInterceptor)
   remove(@Param('id') id: string) {
     return this.categoryService.remove(+id);
   }
