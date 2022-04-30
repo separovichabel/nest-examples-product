@@ -25,18 +25,18 @@ export class CategoryService {
   }
 
   update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    const updateCategory: Category = { id, ...updateCategoryDto }
+    const updateCategory: Category = { id, ...updateCategoryDto };
     return this.repository.save(updateCategory);
   }
 
   async remove(id: number) {
-    const category = await this.repository.findOne(id)
+    const category = await this.repository.findOne(id);
 
     if (category) {
       await this.repository.delete(id);
-      return category
+      return category;
     }
 
-    return
+    return;
   }
 }

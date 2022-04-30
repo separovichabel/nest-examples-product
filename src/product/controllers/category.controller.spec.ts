@@ -12,10 +12,10 @@ describe('CategoryController', () => {
       controllers: [CategoryController],
       providers: [
         CategoryService,
-        { 
+        {
           provide: getRepositoryToken(Category),
-          useValue: {}
-        }
+          useValue: {},
+        },
       ],
     }).compile();
 

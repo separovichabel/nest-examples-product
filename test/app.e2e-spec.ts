@@ -28,7 +28,7 @@ describe('AppController (e2e)', () => {
     app = module.createNestApplication();
     await app.init();
 
-    manager = await module.get(getEntityManagerToken())
+    manager = await module.get(getEntityManagerToken());
   });
 
   afterAll(async () => {
@@ -48,92 +48,94 @@ describe('AppController (e2e)', () => {
     });
 
     it('should return saved categories', async () => {
-      const existingCategory1 = await manager.save(Category, {name: 'nominho'})
-      const existingCategory2 = await manager.save(Category, {name: 'nomão'})
+      const existingCategory1 = await manager.save(Category, {
+        name: 'nominho',
+      });
+      const existingCategory2 = await manager.save(Category, { name: 'nomão' });
 
       const { body } = await request(app.getHttpServer())
         .get('/categories')
-        .expect(200)
+        .expect(200);
 
       expect(body).toEqual([
         { id: existingCategory1.id, name: existingCategory1.name },
         { id: existingCategory2.id, name: existingCategory2.name },
       ]);
     });
-  })
+  });
 
   describe('/categories/:id (GET)', () => {
     it('should return a category', async () => {
-      const existingCategory1 = await manager.save(Category, {name: 'nominho'})
+      const existingCategory1 = await manager.save(Category, {
+        name: 'nominho',
+      });
 
       const { body } = await request(app.getHttpServer())
         .get(`/categories/${existingCategory1.id}`)
-        .expect(200)
+        .expect(200);
 
-      expect(body).toEqual({ id: existingCategory1.id, name: existingCategory1.name });
+      expect(body).toEqual({
+        id: existingCategory1.id,
+        name: existingCategory1.name,
+      });
     });
 
     it('should 404 return when category does not exists', async () => {
-      await request(app.getHttpServer())
-        .get(`/categories/123`)
-        .expect(404)
+      await request(app.getHttpServer()).get(`/categories/123`).expect(404);
     });
-  })
+  });
 
   describe('/categories (POST)', () => {
     it('should save category', async () => {
-      const cat = {name: 'nomão'}
+      const cat = { name: 'nomão' };
 
       const { body } = await request(app.getHttpServer())
         .post(`/categories`)
         .send(cat)
-        .expect(201)
+        .expect(201);
 
-      const createdCat = await manager.findOne(Category, {id: body.id})
+      const createdCat = await manager.findOne(Category, { id: body.id });
 
       expect(body).toEqual({ id: expect.any(Number), name: cat.name });
-      expect(createdCat).toBeDefined()
-      expect(createdCat.name).toBe(cat.name)
+      expect(createdCat).toBeDefined();
+      expect(createdCat.name).toBe(cat.name);
     });
-  })
+  });
 
   describe('/categories/:id (PUT)', () => {
     it('should update a category', async () => {
-      const categoryOld = await manager.save(Category, {name: 'nomozo'})
-      const categoryNew = {name: 'new name'}
+      const categoryOld = await manager.save(Category, { name: 'nomozo' });
+      const categoryNew = { name: 'new name' };
 
       const { body } = await request(app.getHttpServer())
         .put(`/categories/${categoryOld.id}`)
         .send(categoryNew)
-        .expect(200)
+        .expect(200);
 
-      const updatedCat = await manager.findOne(Category, {id: body.id})
+      const updatedCat = await manager.findOne(Category, { id: body.id });
 
       expect(body).toEqual({ id: expect.any(Number), name: categoryNew.name });
-      expect(updatedCat).toBeDefined()
-      expect(updatedCat.name).toBe(categoryNew.name)
+      expect(updatedCat).toBeDefined();
+      expect(updatedCat.name).toBe(categoryNew.name);
     });
-  })
+  });
 
   describe('/categories/:id (DELETE)', () => {
     it('should delete category', async () => {
-      const category = await manager.save(Category, {name: 'Folder'})
+      const category = await manager.save(Category, { name: 'Folder' });
 
       const { body } = await request(app.getHttpServer())
         .delete(`/categories/${category.id}`)
-        .expect(200)
+        .expect(200);
 
-      const updatedCat = await manager.findOne(Category, {id: body.id})
+      const updatedCat = await manager.findOne(Category, { id: body.id });
 
-      expect(updatedCat).not.toBeDefined()
+      expect(updatedCat).not.toBeDefined();
       expect(body).toEqual({ id: expect.any(Number), name: category.name });
-
     });
 
     it('should delete category', async () => {
-      await request(app.getHttpServer())
-        .delete(`/categories/444`)
-        .expect(404)
+      await request(app.getHttpServer()).delete(`/categories/444`).expect(404);
     });
-  })
+  });
 });
