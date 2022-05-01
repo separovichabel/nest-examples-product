@@ -75,4 +75,29 @@ describe('ProductController', () => {
       expect(prodServMock.findOne.mock.calls[0][0]).toBe(prdct.id);
     });
   });
+
+  describe('update()', () => {
+    it('should call service update', async () => {
+      const dto: CreateProductDto = { name: '', categoryId: 1 };
+      const prdct: Product = { id: 2, name: '', categoryId: 1 };
+      prodServMock.update.mockReturnValue(prdct);
+
+      const resp = await controller.update(prdct.id.toString(), dto);
+      expect(resp).toBeDefined();
+      expect(prodServMock.update.mock.calls[0][0]).toBe(prdct.id);
+      expect(prodServMock.update.mock.calls[0][1]).toBe(dto);
+    });
+  });
+
+  describe('delete()', () => {
+    it('should call service update', async () => {
+      const prdct: Product = { id: 2, name: '', categoryId: 1 };
+      prodServMock.remove.mockReturnValue(prdct);
+
+      const resp = await controller.remove(prdct.id.toString());
+      expect(resp).toBeDefined();
+      expect(resp).toBe(prdct);
+      expect(prodServMock.remove.mock.calls[0][0]).toBe(prdct.id);
+    });
+  });
 });
