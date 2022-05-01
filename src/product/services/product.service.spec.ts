@@ -117,7 +117,7 @@ describe('ProductService', () => {
     });
 
     it('should update a product', async () => {
-      jestRepo.save.mockImplementation(async (value) => ({ id, ...content }));
+      jestRepo.save.mockImplementation(async () => ({ id, ...content }));
       jestRepo.findOne.mockImplementation(async (idd) => ({
         id: idd,
         ...content,
@@ -134,7 +134,7 @@ describe('ProductService', () => {
     });
 
     it('should throw error when product contains a non existing categoryId', async () => {
-      catServiceMock.findOne.mockImplementation((idd) => undefined);
+      catServiceMock.findOne.mockImplementation(() => undefined);
       jestRepo.findOne.mockImplementation(async (idd) => ({
         id: idd,
         ...content,
@@ -143,7 +143,7 @@ describe('ProductService', () => {
     });
 
     it('should return undefined if product does not exists', async () => {
-      jestRepo.findOne.mockImplementation((idd) => undefined);
+      jestRepo.findOne.mockImplementation(() => undefined);
       expect(await service.update(id, content)).toBeUndefined();
     });
   });
@@ -151,7 +151,7 @@ describe('ProductService', () => {
     const id = 44;
     const content: UpdateProductDto = { name: 'nome', categoryId: 98 };
     it('should delete from repository', async () => {
-      jestRepo.findOne.mockImplementation((idd) => content);
+      jestRepo.findOne.mockImplementation(() => content);
       jestRepo.remove.mockImplementation((data) => data);
 
       const response = await service.remove(id);
@@ -161,7 +161,7 @@ describe('ProductService', () => {
     });
 
     it('should return undefine if not exists', async () => {
-      jestRepo.findOne.mockImplementation((idd) => undefined);
+      jestRepo.findOne.mockImplementation(() => undefined);
       expect(await service.remove(id)).toBeUndefined();
       expect(jestRepo.findOne.mock.calls[0][0]).toBe(id);
     });

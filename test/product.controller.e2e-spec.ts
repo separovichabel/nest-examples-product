@@ -60,12 +60,12 @@ describe('ProductController (e2e)', () => {
         .get('/products')
         .expect(200);
 
-      const firstEl = body[0]
+      const firstEl = body[0];
 
       expect(firstEl).toBeDefined();
-      expect(product.id).toBe(product.id)
-      expect(product.name).toBe(product.name)
-      expect(product.categoryId).toBe(product.categoryId)
+      expect(product.id).toBe(product.id);
+      expect(product.name).toBe(product.name);
+      expect(product.categoryId).toBe(product.categoryId);
     });
   });
 
@@ -96,7 +96,10 @@ describe('ProductController (e2e)', () => {
   describe('/products (POST)', () => {
     it('should save product', async () => {
       category = await manager.save(Category, { name: 'categoria' });
-      const product: UpdateProductDto = { name: 'nomão', categoryId: category.id };
+      const product: UpdateProductDto = {
+        name: 'nomão',
+        categoryId: category.id,
+      };
 
       const { body } = await request(app.getHttpServer())
         .post(`/products`)
@@ -116,7 +119,10 @@ describe('ProductController (e2e)', () => {
     it('should update a product', async () => {
       // setting Up Data
       category = await manager.save(Category, { name: 'categoria' });
-      const productOld = await manager.save(Product, { name: 'nomozo', categoryId: category.id});
+      const productOld = await manager.save(Product, {
+        name: 'nomozo',
+        categoryId: category.id,
+      });
       const productNew = { name: 'new name', categoryId: category.id };
 
       // Evoking http
@@ -125,13 +131,12 @@ describe('ProductController (e2e)', () => {
         .send(productNew)
         .expect(200);
 
-      console.log('=================', body)
       const updatedCat = await manager.findOne(Product, { id: body.id });
 
-      // checking returned Body 
-      expect(body.id).toBe(productOld.id)
-      expect(body.name).toBe(productNew.name)
-      expect(body.categoryId).toBe(productNew.categoryId)
+      // checking returned Body
+      expect(body.id).toBe(productOld.id);
+      expect(body.name).toBe(productNew.name);
+      expect(body.categoryId).toBe(productNew.categoryId);
 
       expect(updatedCat).toBeDefined();
       expect(updatedCat.name).toBe(productNew.name);
@@ -142,9 +147,9 @@ describe('ProductController (e2e)', () => {
     it('should delete product', async () => {
       category = await manager.save(Category, { name: 'categoria' });
       // Populate
-      const product = await manager.save(Product, { 
+      const product = await manager.save(Product, {
         name: 'Folder',
-        categoryId: category.id
+        categoryId: category.id,
       });
 
       // Performe Deletion

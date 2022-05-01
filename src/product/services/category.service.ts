@@ -39,19 +39,23 @@ export class CategoryService {
     if (!category) {
       return;
     }
-    
-    const categoryIsUsed: boolean = await this.productService.existsWithCategory(id) 
+
+    const categoryIsUsed: boolean =
+      await this.productService.existsWithCategory(id);
 
     if (categoryIsUsed) {
-      throw new HttpException(`Category ${id} should not be used by products to be deleted`, 409)
+      throw new HttpException(
+        `Category ${id} should not be used by products to be deleted`,
+        409,
+      );
     }
 
     const deleteResp = await this.repository.delete(id);
 
     if (!!deleteResp.affected) {
-      return category
+      return category;
     }
 
-    throw new HttpException('Nothing was deleted', 500)
+    throw new HttpException('Nothing was deleted', 500);
   }
 }

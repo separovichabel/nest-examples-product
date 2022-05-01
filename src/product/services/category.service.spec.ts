@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Category } from '../entities/category.entity';
 import { CategoryService } from './category.service';
+import { ProductService } from './product.service';
 
 describe('CategoryService', () => {
   let service: CategoryService;
@@ -9,13 +10,21 @@ describe('CategoryService', () => {
     save: jest.fn(),
     find: jest.fn(),
     findOne: jest.fn(),
-    remove: jest.fn(),
+    delete: jest.fn(),
+  };
+
+  const pService = {
+    existsWithCategory: jest.fn(),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CategoryService,
+        {
+          provide: ProductService,
+          useValue: pService,
+        },
         {
           provide: getRepositoryToken(Category),
           useValue: jestRepo,
@@ -28,6 +37,9 @@ describe('CategoryService', () => {
     // Reset every mocked method from repository before each test
     Object.keys(jestRepo).forEach((key) => {
       jestRepo[key].mockReset();
+    });
+    Object.keys(pService).forEach((key) => {
+      pService[key].mockReset();
     });
   });
 
@@ -53,9 +65,12 @@ describe('CategoryService', () => {
       expect(service.findAll).toBeDefined();
     });
 
-    it('should create category', async () => {
+    it('should find category', async () => {
+      const emptyArr = [];
+      jestRepo.find.mockReturnValue(emptyArr);
       const createdCategory = await service.findAll();
       expect(jestRepo.find.mock.calls.length).toBe(1);
+      expect(createdCategory).toBe(emptyArr);
     });
   });
 
@@ -104,19 +119,31 @@ describe('CategoryService', () => {
 
     it('should return undefined if id not exists', async () => {
       await service.remove(8);
-      expect(jestRepo.remove.mock.calls.length).toBe(0);
+      expect(jestRepo.delete.mock.calls.length).toBe(0);
     });
 
     it('should return the deleted entity', async () => {
       const entity = { id: 9, name: 'folder' };
-      jestRepo.remove.mockReturnValue(entity);
+      jestRepo.delete.mockReturnValue({ affected: 1 });
       jestRepo.findOne.mockImplementation(async (id) =>
         entity.id === id ? entity : undefined,
       );
+      pService.existsWithCategory.mockReturnValue(false);
 
       const resp = await service.remove(entity.id);
-      expect(jestRepo.remove.mock.calls[0][0]).toBe(entity);
-      expect(resp).toBe(entity);
+      expect(jestRepo.delete.mock.calls[0][0]).toBe(entity.id);
+      expect(resp).toBeDefined();
+      expect(resp.id).toBe(entity.id);
+    });
+    it('should not deleted category user by a product', async () => {
+      const entity = { id: 9, name: 'folder' };
+      jestRepo.delete.mockReturnValue({ affected: 1 });
+      jestRepo.findOne.mockImplementation(async (id) =>
+        entity.id === id ? entity : undefined,
+      );
+      pService.existsWithCategory.mockReturnValue(true);
+
+      expect(service.remove(entity.id)).rejects.toThrow();
     });
   });
 });

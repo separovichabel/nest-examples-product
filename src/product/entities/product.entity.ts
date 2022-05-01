@@ -20,7 +20,7 @@ export class Product {
   @Index()
   categoryId: number;
 
-  @ManyToOne((type) => Category)
+  @ManyToOne(() => Category)
   @JoinColumn()
   category?: Category;
 }

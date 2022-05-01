@@ -40,7 +40,7 @@ export class ProductService {
   }
 
   async existsWithCategory(categoryId: number): Promise<boolean> {
-    return !!(await this.repository.findOne({categoryId}))
+    return !!(await this.repository.findOne({ categoryId }));
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
