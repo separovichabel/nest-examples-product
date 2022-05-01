@@ -39,6 +39,10 @@ export class ProductService {
     return this.repository.findOne(id);
   }
 
+  async existsWithCategory(categoryId: number): Promise<boolean> {
+    return !!(await this.repository.findOne({categoryId}))
+  }
+
   async update(id: number, updateProductDto: UpdateProductDto) {
     const product = await this.repository.findOne(id);
 
@@ -51,7 +55,7 @@ export class ProductService {
     );
 
     if (category) {
-      return this.repository.save({ id, ...category });
+      return this.repository.save({ id, ...updateProductDto });
     }
 
     throw new HttpException(

@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -16,6 +17,7 @@ export class Product {
   name: string;
 
   @Column({ nullable: true })
+  @Index()
   categoryId: number;
 
   @ManyToOne((type) => Category)

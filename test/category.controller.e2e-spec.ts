@@ -7,7 +7,7 @@ import { Category } from '../src/product/entities/category.entity';
 import { Product } from '../src/product/entities/product.entity';
 import { EntityManager } from 'typeorm';
 
-describe('AppController (e2e)', () => {
+describe('CategoryController (e2e)', () => {
   let app: INestApplication;
   let manager: EntityManager;
 
@@ -20,7 +20,6 @@ describe('AppController (e2e)', () => {
           database: 'db.sql',
           entities: [Category, Product],
           synchronize: true,
-          logging: true,
         }),
       ],
     }).compile();
@@ -36,6 +35,7 @@ describe('AppController (e2e)', () => {
   });
 
   afterEach(async () => {
+    await manager.query(`DELETE FROM product;`);
     await manager.query(`DELETE FROM category;`);
   });
 

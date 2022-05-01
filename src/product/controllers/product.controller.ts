@@ -3,13 +3,15 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  UseInterceptors,
+  Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateProductDto } from '../dtos/create-product.dto';
 import { UpdateProductDto } from '../dtos/update-product.dto';
+import { NotFoundInterceptor } from '../interceptors/notFound.interceptor';
 import { ProductService } from '../services/product.service';
 
 @ApiTags('products')
@@ -28,16 +30,19 @@ export class ProductController {
   }
 
   @Get(':id')
+  @UseInterceptors(NotFoundInterceptor)
   findOne(@Param('id') id: string) {
     return this.productService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
+  @UseInterceptors(NotFoundInterceptor)
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(+id, updateProductDto);
   }
 
   @Delete(':id')
+  @UseInterceptors(NotFoundInterceptor)
   remove(@Param('id') id: string) {
     return this.productService.remove(+id);
   }
