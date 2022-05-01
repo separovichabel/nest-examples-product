@@ -1,26 +1,72 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateProductDto } from '../dtos/create-product.dto';
 import { UpdateProductDto } from '../dtos/update-product.dto';
+import { Product } from '../entities/product.entity';
+import { CategoryService } from './category.service';
 
 @Injectable()
 export class ProductService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+  constructor(
+    @InjectRepository(Product)
+    private repository: Repository<Product>,
+
+    @Inject(forwardRef(() => CategoryService))
+    private categoryService: CategoryService,
+  ) {}
+
+  async create(createProductDto: CreateProductDto) {
+    const category = await this.categoryService.findOne(
+      createProductDto.categoryId,
+    );
+
+    if (category) {
+      return this.repository.save(createProductDto);
+    }
+
+    throw new HttpException(
+      `categoryId ${createProductDto.categoryId} must exists`,
+      422,
+    );
   }
 
   findAll() {
-    return `This action returns all product`;
+    return this.repository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} product`;
+    return this.repository.findOne(id);
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: number, updateProductDto: UpdateProductDto) {
+    const product = await this.repository.findOne(id);
+
+    if (!product) {
+      return;
+    }
+
+    const category = await this.categoryService.findOne(
+      updateProductDto.categoryId,
+    );
+
+    if (category) {
+      return this.repository.save({ id, ...category });
+    }
+
+    throw new HttpException(
+      `categoryId ${updateProductDto.categoryId} must exists`,
+      422,
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: number) {
+    const product = await this.repository.findOne(id);
+
+    if (product) {
+      return this.repository.remove(product);
+    }
+
+    return;
   }
 }

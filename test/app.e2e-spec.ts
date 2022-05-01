@@ -122,16 +122,18 @@ describe('AppController (e2e)', () => {
 
   describe('/categories/:id (DELETE)', () => {
     it('should delete category', async () => {
+      // Populate
       const category = await manager.save(Category, { name: 'Folder' });
 
+      // Performe Deletion
       const { body } = await request(app.getHttpServer())
         .delete(`/categories/${category.id}`)
         .expect(200);
 
       const updatedCat = await manager.findOne(Category, { id: body.id });
 
-      expect(updatedCat).not.toBeDefined();
-      expect(body).toEqual({ id: expect.any(Number), name: category.name });
+      expect(updatedCat).toBeUndefined();
+      expect(body.name).toEqual(category.name);
     });
 
     it('should delete category', async () => {

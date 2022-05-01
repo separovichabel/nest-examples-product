@@ -9,7 +9,7 @@ describe('CategoryService', () => {
     save: jest.fn(),
     find: jest.fn(),
     findOne: jest.fn(),
-    delete: jest.fn(),
+    remove: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -102,12 +102,21 @@ describe('CategoryService', () => {
       expect(service.remove).toBeDefined();
     });
 
-    it('should call repositorys delete', async () => {
-      const id = 8;
-      await service.remove(id);
-      expect(jestRepo.delete.mock.calls.length).toBe(1);
-      expect(jestRepo.delete.mock.calls[0][0]).toBeDefined();
-      expect(jestRepo.delete.mock.calls[0][0]).toBe(id);
+    it('should return undefined if id not exists', async () => {
+      await service.remove(8);
+      expect(jestRepo.remove.mock.calls.length).toBe(0);
+    });
+
+    it('should return the deleted entity', async () => {
+      const entity = { id: 9, name: 'folder' };
+      jestRepo.remove.mockReturnValue(entity);
+      jestRepo.findOne.mockImplementation(async (id) =>
+        entity.id === id ? entity : undefined,
+      );
+
+      const resp = await service.remove(entity.id);
+      expect(jestRepo.remove.mock.calls[0][0]).toBe(entity);
+      expect(resp).toBe(entity);
     });
   });
 });

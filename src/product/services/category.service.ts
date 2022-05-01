@@ -33,8 +33,7 @@ export class CategoryService {
     const category = await this.repository.findOne(id);
 
     if (category) {
-      await this.repository.delete(id);
-      return category;
+      return this.repository.remove(category);
     }
 
     return;
