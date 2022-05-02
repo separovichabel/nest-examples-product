@@ -7,12 +7,16 @@ import {
   Delete,
   UseInterceptors,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateProductDto } from '../dtos/create-product.dto';
+import { QueryProductDto } from '../dtos/query-product.dto';
 import { UpdateProductDto } from '../dtos/update-product.dto';
 import { NotFoundInterceptor } from '../interceptors/notFound.interceptor';
 import { ProductService } from '../services/product.service';
+import { JoiValidationPipe } from '../validation/joiValidation.pipe';
+import { queryProductSchema } from '../validation/query-product.schema';
 
 @ApiTags('products')
 @Controller('products')
@@ -25,8 +29,10 @@ export class ProductController {
   }
 
   @Get()
-  findAll() {
-    return this.productService.findAll();
+  findAll(
+    @Query(new JoiValidationPipe(queryProductSchema)) query?: QueryProductDto,
+  ) {
+    return this.productService.findAll(query);
   }
 
   @Get(':id')

@@ -67,6 +67,39 @@ describe('ProductController (e2e)', () => {
       expect(product.name).toBe(product.name);
       expect(product.categoryId).toBe(product.categoryId);
     });
+
+    it('should limit products returned', async () => {
+      category = await manager.save(Category, { name: 'categoria' });
+      const category2 = await manager.save(Category, { name: 'categoria' });
+      await manager.save(Product, [
+        { name: 'nominho', categoryId: category.id },
+        { name: 'nomoso', categoryId: category2.id },
+      ]);
+
+      const { body } = await request(app.getHttpServer())
+        .get('/products')
+        .query({ limit: 1 })
+        .expect(200);
+
+      expect(body).toBeDefined();
+      expect(body.length).toBe(1);
+    });
+
+    it('should Bad request for wrong query', async () => {
+      category = await manager.save(Category, { name: 'categoria' });
+      const category2 = await manager.save(Category, { name: 'categoria' });
+      await manager.save(Product, [
+        { name: 'nominho', categoryId: category.id },
+        { name: 'nomoso', categoryId: category2.id },
+      ]);
+
+      const { body } = await request(app.getHttpServer())
+        .get('/products')
+        .query({ limit: -1 })
+        .expect(400);
+
+      expect(body).toBeDefined();
+    });
   });
 
   describe('/products/:id (GET)', () => {

@@ -1,7 +1,8 @@
 import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { CreateProductDto } from '../dtos/create-product.dto';
+import { QueryProductDto } from '../dtos/query-product.dto';
 import { UpdateProductDto } from '../dtos/update-product.dto';
 import { Product } from '../entities/product.entity';
 import { CategoryService } from './category.service';
@@ -31,8 +32,24 @@ export class ProductService {
     );
   }
 
-  findAll() {
-    return this.repository.find();
+  findAll(query?: QueryProductDto) {
+    const findOption: FindManyOptions<Product> = {
+      take: 10,
+    };
+
+    if (query && query.limit) {
+      findOption.take = query.limit;
+    }
+
+    if (query && query.page) {
+      findOption.skip = (query.page - 1) * findOption.take;
+    }
+
+    if (query && query.categoryId) {
+      findOption.where = { categoryId: query.categoryId };
+    }
+
+    return this.repository.find(findOption);
   }
 
   findOne(id: number) {
