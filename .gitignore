@@ -34,3 +34,6 @@ db.sql
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Runtime data
+temp

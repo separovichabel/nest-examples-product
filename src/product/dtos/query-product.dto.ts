@@ -2,11 +2,11 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class QueryProductDto {
   @ApiPropertyOptional()
-  page: number;
+  page?: number;
 
   @ApiPropertyOptional()
-  limit: number;
+  limit?: number;
 
   @ApiPropertyOptional()
-  categoryId: number;
+  categoryId?: number;
 }
