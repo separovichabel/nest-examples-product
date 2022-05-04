@@ -4,7 +4,7 @@ import * as readline from 'readline';
 import { Writable } from 'stream';
 import { ExportServiceInterface } from 'src/product/services/ExportService.interface';
 import { createReadStream } from 'fs';
-import { readdir, mkdir } from 'fs/promises';
+import { mkdir, readdir } from 'fs/promises';
 
 @Injectable()
 export class ExportationService<T> implements OnModuleInit {
