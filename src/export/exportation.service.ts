@@ -1,12 +1,27 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { QueryInterface } from 'src/product/dtos/query.interface';
 import * as readline from 'readline';
 import { Writable } from 'stream';
 import { ExportServiceInterface } from 'src/product/services/ExportService.interface';
 import { createReadStream } from 'fs';
+import { readdir, mkdir } from 'fs/promises';
 
 @Injectable()
-export class ExportationService<T> {
+export class ExportationService<T> implements OnModuleInit {
+  private path = 'temp';
+
+  async onModuleInit() {
+    await this.createDefaultPaths();
+  }
+
+  private async createDefaultPaths() {
+    const tempPathImportExists = (await readdir('.')).includes(this.path);
+
+    if (!tempPathImportExists) {
+      await mkdir(this.path);
+    }
+  }
+
   async exportData(
     query: QueryInterface,
     writable: Writable,
