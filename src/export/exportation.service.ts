@@ -1,47 +1,64 @@
 import { Injectable } from '@nestjs/common';
-import { Product } from 'src/product/entities/product.entity';
-import { ProductService } from '../product/services/product.service';
-import { FileSerivce } from './file.service';
+import { QueryInterface } from 'src/product/dtos/query.interface';
+import * as readline from 'readline';
+import { Writable } from 'stream';
+import { ExportServiceInterface } from 'src/product/services/ExportService.interface';
+import { createReadStream } from 'fs';
 
 @Injectable()
-export class ExportationService {
-    constructor(
-        private productService: ProductService,
-        private fileSerivce: FileSerivce,
-    ) {}
+export class ExportationService<T> {
+  async exportData(
+    query: QueryInterface,
+    writable: Writable,
+    exportService: ExportServiceInterface<T>,
+  ) {
+    query.page = 1;
+    let data: T[] = [];
 
-    async exportProductsByCategoryId(categoryId: number) {
-        const fileName = await this.fileSerivce.createFile()
+    while (true) {
+      data = await exportService.findAll(query);
 
-        let page = 1;
-        let products: Product[] = []
+      if (data.length === 0) {
+        break;
+      }
 
-        while (true) {
-            products = await this.productService.findAll({categoryId, page})
-
-            if (products.length === 0) {
-                break
-            }
-
-            const formatedContent = this.formatContent(products, page !== 1)
-
-            await this.fileSerivce.appendFile(fileName, formatedContent)
-            page++
-
-        }
-
-        this.fileSerivce.closeFile(fileName)
-
-        return fileName;
+      data.forEach((c) => writable.write(JSON.stringify(c) + '\n'));
+      query.page++;
     }
 
-    
-  private formatContent(contentRaw: any[], addBeginnigComma: boolean = false): string {
-    const contentString = JSON.stringify(contentRaw)
+    writable.end();
+    return;
+  }
 
-    // removing square brackets
-    const formatedContent = contentString.slice(0, contentString.length -1).slice(1)
+  async importData(fileName: string, exportService: ExportServiceInterface<T>) {
+    let totalReads = 0;
+    let totalFinished = 0;
 
-    return addBeginnigComma ? ',' + formatedContent : formatedContent;
+    // Awaits until the process ends
+    const resp = new Promise((resolve, reject) => {
+      const readable = createReadStream('./' + fileName);
+      const rl = readline.createInterface(readable);
+
+      // read Each line to insert into database
+      rl.on('line', async (input: string) => {
+        totalReads++;
+
+        try {
+          const object = JSON.parse(input);
+          delete object.id;
+          await exportService.create(object);
+        } catch (err) {
+          rl.close();
+          reject(err);
+        }
+
+        totalFinished++;
+        if (readable.readableEnded && totalReads === totalFinished) {
+          resolve(true);
+        }
+      });
+    });
+
+    return resp;
   }
 }
