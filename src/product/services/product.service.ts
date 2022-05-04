@@ -6,9 +6,12 @@ import { QueryProductDto } from '../dtos/query-product.dto';
 import { UpdateProductDto } from '../dtos/update-product.dto';
 import { Product } from '../entities/product.entity';
 import { CategoryService } from './category.service';
+import { ExportServiceInterface } from './ExportService.interface';
 
 @Injectable()
-export class ProductService {
+export class ProductService
+  implements ExportServiceInterface<CreateProductDto>
+{
   constructor(
     @InjectRepository(Product)
     private repository: Repository<Product>,
@@ -32,7 +35,7 @@ export class ProductService {
     );
   }
 
-  findAll(query?: QueryProductDto) {
+  queryProductToFindOption(query?: QueryProductDto) {
     const findOption: FindManyOptions<Product> = {
       take: 10,
     };
@@ -49,6 +52,11 @@ export class ProductService {
       findOption.where = { categoryId: query.categoryId };
     }
 
+    return findOption;
+  }
+
+  findAll(query?: QueryProductDto) {
+    const findOption = this.queryProductToFindOption(query);
     return this.repository.find(findOption);
   }
 
