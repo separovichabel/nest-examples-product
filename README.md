@@ -1,5 +1,7 @@
 # Product API
 
+## Pre-req
+Docker and Docker Compose should be installed.
 
 ## Runnig the APP
 
