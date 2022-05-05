@@ -35,7 +35,7 @@ export class ExportationController {
     );
   }
 
-  @Post('upload')
+  @Post('category/:categoryId/import-products')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -49,7 +49,7 @@ export class ExportationController {
     },
   })
   @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return this.exportation.importData(file.path, this.productService);
+  uploadFile(@UploadedFile() file: Express.Multer.File, @Param('categoryId') categoryId: string) {
+    return this.exportation.importData(file.path, this.productService, +categoryId);
   }
 }

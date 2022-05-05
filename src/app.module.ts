@@ -11,7 +11,7 @@ import { ProductModule } from './product/product.module';
     ExportationModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      host: 'postgres',
       port: 5432,
       username: 'root',
       password: 'root',

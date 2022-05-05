@@ -45,7 +45,7 @@ export class ExportationService<T> implements OnModuleInit {
     return;
   }
 
-  async importData(fileName: string, exportService: ExportServiceInterface<T>) {
+  async importData(fileName: string, exportService: ExportServiceInterface<T>, categoryId?: number) {
     let totalReads = 0;
     let totalFinished = 0;
 
@@ -61,6 +61,7 @@ export class ExportationService<T> implements OnModuleInit {
         try {
           const object = JSON.parse(input);
           delete object.id;
+          object.categoryId = categoryId
           await exportService.create(object);
         } catch (err) {
           rl.close();
