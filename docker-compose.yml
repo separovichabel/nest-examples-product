@@ -1,0 +1,27 @@
+version: '3.1'
+
+services:
+  postgres:
+    image: postgres:14
+    restart: always
+    networks:
+      - app-tier
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: product
+  product:
+    image: product:latest
+    build: .
+    ports:
+      - 3000:3000
+    networks:
+      - app-tier
+    depends_on:
+      - postgres
+
+networks:
+  app-tier:
+    driver: bridge
